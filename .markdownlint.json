@@ -3,5 +3,10 @@
   "MD013": {
     "code_blocks": false,
     "tables": false
+  },
+  "no-inline-html": {
+    "allowed_elements": [
+      "sup"
+    ]
   }
 }

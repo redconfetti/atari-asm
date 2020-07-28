@@ -87,7 +87,7 @@ There were several releases of the Atari 2600.
 [TIA Chip]: https://en.wikipedia.org/wiki/Television_Interface_Adaptor
 [6532 RAM-I/O-Timer (RIOT) Chip]: https://en.wikipedia.org/wiki/MOS_Technology_6532
 
-# MOS 6502
+## MOS 6502
 
 ![MOS 6502 Pinout][MOS 6502 Pin Diagram]
 
@@ -96,7 +96,7 @@ There were several releases of the Atari 2600.
 The 6502 is essentially a cheaper 28-pin package. A15 to A13, and other
 interuption lines are not accessible.
 
-# Binary and Hexadecimal
+## Binary and Hexadecimal
 
 How things get stored in the metal?
 
@@ -125,7 +125,7 @@ We are able to group bits together to represent different types of data.
 
 11010001
 
-## Base 10
+### Base 10
 
 Humans use a base 10 numeric system: decimal system. This is likely because
 we have 10 fingers. Remember, fingers are also called "digits".
@@ -135,7 +135,7 @@ thirties, etc. It goes on into the hundreds, thousands, millions, billions, etc.
 
 This is all based on 10. Powers of 10.
 
-## Base 2
+### Base 2
 
 How do computers count in base 2?
 
@@ -150,7 +150,6 @@ As you can see here with a 2 bit representation, we can only represent numbers
 | 0 | 1 | 1      |
 | 1 | 0 | 2      |
 | 1 | 1 | 3      |
-
 
 The columns continue in powers of 2.
 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, etc.
@@ -211,9 +210,9 @@ The 2<sup>0</sup> column is the LSB - Least significant bit
 
 Binary and Decimal... Is there anything else?
 
-* 10 can be divided by 2 or 5
-* 12 can be divided by 2, 3, 4, or 6
-* 8 can be divided by 2 or 4
+- 10 can be divided by 2 or 5
+- 12 can be divided by 2, 3, 4, or 6
+- 8 can be divided by 2 or 4
 
 Some say that we should be using base 8 or base 12. They are divisible by more
 numbers than base 10.
@@ -225,7 +224,7 @@ pointer of the count, with each finger divided at the knuckles
 
 [Base 12 Hand Diagram]: assets/base-12.png
 
-## Base 16 - Hexadecimal
+### Base 16 - Hexadecimal
 
 | 16<sup>0</sup> | Hex |
 |----------------|-----|
@@ -245,3 +244,121 @@ pointer of the count, with each finger divided at the knuckles
 | 13             | D   |
 | 14             | E   |
 | 15             | F   |
+
+## Memory Positions
+
+Adapted from [](https://www.randomterrain.com/atari-2600-memories-tutorial-andrew-davie-05.html)
+
+The 6502 is able to address 65536 (2^16) bytes of memory, each with a unique
+address. However the 2600 CPU (6507) is only able to directly access 2^13 bytes
+(8192 bytes) of memory. Only 13 of the 16 address lines are connected
+physically.
+
+| Address Range  | Size (Bytes) | Function           |
+|----------------|--------------| ------------------ |
+| $0000 - $007F  |              | TIA registers      |
+| $0080 - $00FF  | 128          | RAM                |
+| $0200 - $02FF  |              | RIOT registers     |
+| $1000 - $1FFF  | 4096         | ROM                |
+
+### Zero is Zero
+
+`%0000000000000` to `%1111111111111` = from `$0000` to `$1FFF`
+
+`$0000` is the same as '%000'. Zero is zero (0 is 0).
+
+### Reads and/or Writes
+
+All communication between the CPU and hardware (ROM, RAM, I/O, the TIA, etc) is
+through reads and/or writes to memory locations.
+
+The memory range between $0 and $1FFFF must contain our RAM, some must contain
+our ROM (program), and some must allow us to communicate with the TIA or other
+hardware connected to the machine.
+
+### RAM
+
+We only have 128 bytes of RAM on the 2600. It lives at addresses $80 - $FF.
+Any write to $80 (128 decimal) will be to the first byte of RAM.
+
+### TIA
+
+Writing to the TIA registers is just like any other area of memory, however when
+you write to those locations, the TIA is 'watching' them and thus changing what
+it draws on a scanline.
+
+- $0000
+- ...
+- ...
+- $FFF7
+- $FFF8
+- $FFF9
+- $FFFA
+- $FFFB
+- $FFFC - Reset vector
+- $FFFD
+- $FFFE
+- $FFFF - Last memory position
+
+## Stella Emulator
+
+### Debugger
+
+The [Stella Atari 2600 VCS emulator] comes with a debugger.
+
+Pressing the back-tick key on the keyboard will open the debugger mode.
+It has a console that accepts commands such as `help`.
+
+![Stella Debugger][Stella Debugger]
+
+It has a 'TIA' tab that can be used to view the television interface adapter
+(TIA) chip registers.
+
+![Stella Debugger TIA view][Stella Debugger TIA]
+
+The 'I/O' tab provides the state of the joystick inputs and more.
+
+![Stella Debugger IO view][Stella Debugger IO]
+
+The 'Audio' tab provides the state of the audio system.
+
+![Stella Debugger Audio view][Stella Debugger Audio]
+
+In the upper-right section of this window, we can see the registers of the
+processor itself.
+
+Displayed are:
+
+- PC - Program Counter
+- SP - Stack Pointer
+- A - Register A
+- X - Register X
+- Y - Register Y
+- PS - Processor Status flags
+  - Negative flag
+  - Overflow flag
+  - Zero flag
+  - Carry flag
+
+Below the flags a table of the memory addresses and their hex values.
+
+![Stella Debugger CPU view][Stella Debugger Processor]
+
+The lower-right section of the debugger window features the 'Disassembly' tab
+with the assembly commands for our ROM listed, along with the hex value
+representations of those commands listed to the column on the right.
+
+![Stella Debugger Disassembly][Stella Debugger Disassembly]
+
+If you right-click on the first line, a menu will show that lets you choose
+to 'Set PC @ current line'. You'll see the 'PC' register above set to the
+address of the line after you choose this option.
+
+[Stella Atari 2600 VCS emulator]: https://stella-emu.github.io/
+[Stella Debugger]: assets/stella-debugger-full.png
+[Stella Debugger TIA]: assets/stella-debugger-tia.png
+[Stella Debugger Audio]: assets/stella-debugger-audio.png
+[Stella Debugger IO]: assets/stella-debugger-io.png
+[Stella Debugger CPU]: assets/stella-debugger-processor.png
+[Stella Debugger Disassembly]: assets/stella-debugger-disassembly.png
+[Stella Debugger Processor]: assets/stella-debugger-processor.png

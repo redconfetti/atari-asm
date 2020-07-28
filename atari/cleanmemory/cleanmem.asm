@@ -19,10 +19,11 @@ MemLoop:
   sta $0,X    ; store zero at address $0 + X
   dex         ; x--
   bne MemLoop ; loop until X==0 (z-flag set)
+              ; z-flag is only set if decrement reaches zero
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Fill ROM size to exactly 4KB
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  org $FFFC
+  org $FFFC   ; force to 4 bytes before end position
   .word Start ; reset vector at $FFFC (where program starts)
   .word Start ; interrupt vector at $FFFE (unused in Atari VCS)
