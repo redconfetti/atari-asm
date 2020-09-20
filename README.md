@@ -33,6 +33,12 @@ cd atari/cleanmemory
 
 # assemble in 6502 format, non-verbose, outputting to 'cart.bin'
 dasm cleanmem.asm -f3 -v0 -ocart.bin
+
+# use makefile
+make help
+make build
+make run
+make clean
 ```
 
 ## Emulator
