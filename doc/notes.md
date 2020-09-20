@@ -226,6 +226,8 @@ pointer of the count, with each finger divided at the knuckles
 
 ### Base 16 - Hexadecimal
 
+Hexadecimal is an easier to remember representation of binary representations.
+
 | 16<sup>0</sup> | Hex |
 |----------------|-----|
 | 0              | 0   |
@@ -244,6 +246,13 @@ pointer of the count, with each finger divided at the knuckles
 | 13             | D   |
 | 14             | E   |
 | 15             | F   |
+
+For example this binary representation `01001111` is 79 in decimal, but '4F'
+in hexadecimal.
+
+See [Binary to Hex]
+
+[Binary to Hex]: https://www.rapidtables.com/convert/number/binary-to-hex.html
 
 ## Memory Positions
 
@@ -307,25 +316,43 @@ it draws on a scanline.
 The [Stella Atari 2600 VCS emulator] comes with a debugger.
 
 Pressing the back-tick key on the keyboard will open the debugger mode.
-It has a console that accepts commands such as `help`.
 
 ![Stella Debugger][Stella Debugger]
+
+#### Video Preview
+
+In the upper-left corner, there is a box which displays a visual representation
+of what is displayed on the television set via the TIA chip.
+
+#### Prompt Tab
+
+It has a console that accepts commands such as `help`.
+
+#### TIA Tab
 
 It has a 'TIA' tab that can be used to view the television interface adapter
 (TIA) chip registers.
 
 ![Stella Debugger TIA view][Stella Debugger TIA]
 
+#### Input/Output (I/O) Tab
+
 The 'I/O' tab provides the state of the joystick inputs and more.
 
 ![Stella Debugger IO view][Stella Debugger IO]
+
+#### Audio Tab
 
 The 'Audio' tab provides the state of the audio system.
 
 ![Stella Debugger Audio view][Stella Debugger Audio]
 
+#### CPU Registers
+
 In the upper-right section of this window, we can see the registers of the
 processor itself.
+
+![Stella Debugger CPU Registers][Stella Debugger CPU Registers]
 
 Displayed are:
 
@@ -340,19 +367,37 @@ Displayed are:
   - Zero flag
   - Carry flag
 
-Below the flags a table of the memory addresses and their hex values.
+#### Memory Registers
 
-![Stella Debugger CPU view][Stella Debugger Processor]
+Below the CPU register display, the memory registers and their hex values ar
+shown.
+
+![Stella Debugger Memory][Stella Debugger Memory]
+
+#### Disassembly Tab
 
 The lower-right section of the debugger window features the 'Disassembly' tab
 with the assembly commands for our ROM listed, along with the hex value
 representations of those commands listed to the column on the right.
 
+The hex representations are the op codes converted to the format used with the
+6502 processor.
+
 ![Stella Debugger Disassembly][Stella Debugger Disassembly]
 
-If you right-click on the first line, a menu will show that lets you choose
-to 'Set PC @ current line'. You'll see the 'PC' register above set to the
+##### Running Commands
+
+If you right-click on the first line (`SEI`), a menu will show that lets you
+choose to 'Set PC @ current line'. You'll see the 'PC' register above set to the
 address of the line after you choose this option.
+
+![Stella Debugger Disassembly Set PC][Stella Debugger Disassembly Set PC]
+
+#### Starting Over
+
+We can right-click on the first line "Start", and choose
+
+We can run our ROM again from the beginning by
 
 [Stella Atari 2600 VCS emulator]: https://stella-emu.github.io/
 [Stella Debugger]: assets/stella-debugger-full.png
@@ -360,5 +405,7 @@ address of the line after you choose this option.
 [Stella Debugger Audio]: assets/stella-debugger-audio.png
 [Stella Debugger IO]: assets/stella-debugger-io.png
 [Stella Debugger CPU]: assets/stella-debugger-processor.png
+[Stella Debugger CPU Registers]: assets/stella-debugger-cpu-registers.png
 [Stella Debugger Disassembly]: assets/stella-debugger-disassembly.png
-[Stella Debugger Processor]: assets/stella-debugger-processor.png
+[Stella Debugger Disassembly Set PC]: assets/stella-debugger-disassembly-set-pc.png
+[Stella Debugger Memory]: assets/stella-debugger-memory.png
