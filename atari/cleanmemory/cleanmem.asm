@@ -14,10 +14,11 @@ Start:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   lda #0      ; A = 0
   ldx #$FF    ; X = #$FF
+  sta $FF     ; make sure $FF is zeroed before the loop starts
 
 MemLoop:
-  sta $0,X    ; store zero at address $0 + X
   dex         ; x--
+  sta $0,X    ; store zero at address $0 + X
   bne MemLoop ; loop until X==0 (z-flag set)
               ; z-flag is only set if decrement reaches zero
 
