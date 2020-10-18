@@ -109,11 +109,239 @@ other locations in such systems, but no longer applies to modern systems.
 
 ## Sending Instructions to the Display
 
+See [colorbg.asm](../atari/colorbg/colorbg.asm) for usage of
+the `CLEAN_START` macro from [macro.h](../atari/colorbg/macro.h).
 
+Our program is setup to set the background color of the screen to yellow.
+
+If you see the [Atari 2600 NTSC color palette] reference in Wikipedia, you'll
+see that pure yellow has a luminance/hue value of 1/14, represented by `1E` in
+hexadecimal.
+
+[Atari 2600 NTSC color palette]: https://en.wikipedia.org/wiki/List_of_video_game_console_palettes#NTSC
+
+We have a `Makefile` in our directory with the commands used to assemble our
+`cart.bin` cartridge file, and also our command to run the cartridge in Stella.
+
+```bash
+cd atari/colorbg
+make all
+make run
+```
+
+After running the program, you might notice that it's not displaying yellow.
+You have to press the 'TAB' key to access the options, then select
+'Game Properties'. Under the 'Emulation' tab, select 'NTSC' for 'TV format'.
+
+Now we can see the yellow displayed on the screen. There is yellow and black
+flickering on the screen. Why is this? Because line 8 of our program continually
+is clearing the memory when we return to START.
+
+If we comment this out and reassemble our cartridge, then run it in NTSC mode,
+it will display a solid yellow background.
 
 ## Stella Debugger Warnings
 
+You might notice when you load your cartridge in Stella that the 'Prompt' tab
+has several messages shown.
+
+```shell
+Stella 6.2.1
+> autoExec():
+
+script file '~/Library/Application Support/Stella/autoexec.script' not found
+script file 'cart.script' not found
+config file '~/Library/Application Support/Stella/cfg/cart.cfg' not found
+list file 'cart.lst' not found
+symbol file 'cart.sym' not found
+```
+
+These are warning messages about certain files that Stella supports for certain
+purposes. Right now our Makefile is only generating the cart.bin file as its
+out put.
+
+`dasm *.asm -f3 -v0 -ocart.bin`
+
+We can expand this to generate other files that Stella is looking for.
+
+`dasm *.asm -f3 -v0 -ocart.bin -lcart.lst -scart.sym`
+
+* cart.lst - list file
+* cart.sym - contains symbols from our source code, variable names, addressing
+  labels, etc.
+
+This symbols file is useful to programmers because we're able to see the labels
+we use instead of just a memory address.
+
+Before:
+```Assembly
+F0090:
+  STA $0, X
+  DEX
+  BNE F0090
+```
+
+After:
+```Assembly
+MEMLOOP:
+  STA $0, X
+  DEX
+  BNE F0090
+```
+
+If you run your cartridge again, you'll see the symbols used in the debugger
+for Stella.
+
+You'll still get warnings concerning these files, but these can be left alone.
+
+* cart.script - script file
+* autoexec.script - system level Stella start script
+* cart.cfg - system level general Stella config
+
 ## NTSC Video Synchronization
+
+The VCS was designed to work with two configurations of TIA chip - the NTSC
+(North American) version, and PAL (most of Europe / Africa / Asia).
+
+The NTSC synchronization method specifies a certain method of synchronization
+between the CPU and the rendered display, with certain buffers of time for the
+CPU to prepare the upcoming frame rendered to the screen.
+
+Each full rendering to the entire screen is referred to as the 'frame'.
+
+### Scanlines
+
+In modern computers we're able to store the state of every pixel that is being
+displayed on the screen. The VCS system was designed during a time when memory
+was not available to store a mirror of the frame being displayed to the CRT.
+
+The TIA chip instead deals with scanlines drawn from left to right across the
+screen rapidly, from top to bottom. Programmers had to do something called
+"racing the beam". Everything has to be done scanline-by-scanline.
+
+### Horizontal Blank
+
+How does our processor know when we are done rendering a specific scanline?
+There is something called a Horizontal Blank, which takes up 68 color clocks,
+which is the period of time when the 3.8 megahertz clock is not drawing the
+scanline to the screen after it has finished the last scanline.
+
+* Horizontal Blank - 68 color clocks
+* Visible Scanline - 160 color clocks (pixels)
+
+So it is during the 68 color clocks that we can reconfigure what the content of
+the rendered scanline will be during the 160 color clocks.
+
+To control when a scanline finishes, the processor is halted until it receives
+a WSYNC signal from the TIA. This keeps the processor from performing actions
+while the TIA is resetting.
+
+### Vertical syncronization
+
+The NTSC format tells us that there is a time period called the 'vertical sync',
+which is 3 scanlines. This tells our VCS when a frame starts and ends.
+
+After the 3 scanlines, there is a space called the 'vertical blank', which is
+37 scanlines long, is a buffer space before rendering visible lines.
+
+After the Vertical sync, vertical blank, and rendered scanlines, we have 30
+scanlines called the 'over scan', before we start with a new frame again.
+
+```shell
+------------------------------------------------------
+|            VERTICAL SYNC (3 scanlines)             |
+------------------------------------------------------
+|                                                    |
+|           VERTICAL BLANK (37 scanlines)            |
+|                                                    |
+------------------------------------------------------
+|              |                                     |
+|              |                                     |
+|              |                                     |
+|  HORIZONTAL  |           RENDERED PIXELS           |
+|    BLANK     |                                     |
+|              |                                     |
+|              |                                     |
+|              |                                     |
+------------------------------------------------------
+|                                                    |
+|             OVERSCAN (30 scanlines)                |
+|                                                    |
+------------------------------------------------------
+```
+
+* NTSC Standard
+  * Vertical Sync - 3 scanlines
+  * Vertical Blank - 37 scanlines
+  * Visible Scanline - 192 scanlines
+  * Overscan - 30 scanlines
+
+* Vertical color clocks - 228
+
+There is a relationship between the color clocks, and the CPU cycles.
+There are 228 total vertical color clocks (68 horizontal blank + 160 rendered),
+which correspond to 76 CPU cycles.
+
+228 color clocks / 76 CPU cycles = 3 color clocks per CPU cycle
+
+We have to program in lockstep with these NTSC specifications.
+
+### NTSC in Assembly
+
+```assembly
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Start a new frame by turning on VBLANK and VSYNC
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+NextFrame:
+  lda #2                ; same as binary #%00000010
+  sta VBLANK            ; turn on VBLANK
+  sta VSYNC             ; turn on VSYNC
+```
+
+We are actually going to have a loop that we run through frame by frame, jumping
+to `NextFrame` after the previous loop completes.
+
+We are storing the decimal 2 value in register A, then we're sending that value
+to the VBLANK and VSYNC memory locations.
+
+```assembly
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Generate the three lines of VSYNC
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  sta WSYNC             ; first scanline
+  sta WSYNC             ; second scanline
+  sta WSYNC             ; third scanline
+
+  lda #0
+  sta VSYNC             ; turn off VSYNC
+```
+
+When we write the value to the WSYNC memory address, this halts the processor
+during the TIA scanline process for each of the 3 scanlines.
+
+Then writing the decimal value of 0 to the VSYNC memory address ends the
+VSYNC process.
+
+```assembly
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Output the 37 recommended lines of VBLANK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ldx #37               ; count of 37 scanlines
+LoopVBlank:
+  sta WSYNC             ; hit WSYNC to wait for the next scanline
+  dex                   ; decrement X
+  bne LoopVBlank        ; loop until X==0
+
+  lda #0
+  sta VBLANK            ; turn off VBLANK
+```
+
+Here we set a value in register X for the number of times we want to loop
+through the process of waiting (WSYNC). We decrement the value in X, then we
+loop back to `LoopVBlank` if the value of X is not equal to 0 (Break if not
+equal).
+
+After the loop is complete, we turn off the VBLANK mode.
 
 ## Painting the CRT
 
