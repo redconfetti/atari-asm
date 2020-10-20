@@ -109,8 +109,8 @@ other locations in such systems, but no longer applies to modern systems.
 
 ## Sending Instructions to the Display
 
-See [colorbg.asm](../atari/colorbg/colorbg.asm) for usage of
-the `CLEAN_START` macro from [macro.h](../atari/colorbg/macro.h).
+See [colorbg.asm](../src/colorbg/colorbg.asm) for usage of
+the `CLEAN_START` macro from [macro.h](../src/colorbg/macro.h).
 
 Our program is setup to set the background color of the screen to yellow.
 
@@ -124,7 +124,7 @@ We have a `Makefile` in our directory with the commands used to assemble our
 `cart.bin` cartridge file, and also our command to run the cartridge in Stella.
 
 ```bash
-cd atari/colorbg
+cd src/colorbg
 make all
 make run
 ```
@@ -346,6 +346,6 @@ After the loop is complete, we turn off the VBLANK mode.
 ## Painting the CRT
 
 We're going to paint a rainbow to the CRT with our program. See our
-[rainbow directory](../atari/rainbow) for code.
+[rainbow directory](../src/rainbow) for code.
 
 [Back to Notes](./notes.md)

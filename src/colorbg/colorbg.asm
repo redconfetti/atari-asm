@@ -1,6 +1,6 @@
   processor 6502
-  include "vcs.h"
-  include "macro.h"
+  include "../include/vcs.h"
+  include "../include/macro.h"
   seg code
   org $F000       ; define the code origin at $F000
 
