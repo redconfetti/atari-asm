@@ -345,4 +345,7 @@ After the loop is complete, we turn off the VBLANK mode.
 
 ## Painting the CRT
 
+We're going to paint a rainbow to the CRT with our program. See our
+[rainbow directory](../atari/rainbow) for code.
+
 [Back to Notes](./notes.md)
