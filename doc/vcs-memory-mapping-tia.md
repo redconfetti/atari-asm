@@ -109,8 +109,8 @@ other locations in such systems, but no longer applies to modern systems.
 
 ## Sending Instructions to the Display
 
-See [colorbg.asm](../src/colorbg/colorbg.asm) for usage of
-the `CLEAN_START` macro from [macro.h](../src/colorbg/macro.h).
+See [colorbg.asm](../src/2_colorbg/colorbg.asm) for usage of
+the `CLEAN_START` macro from [macro.h](../src/include/macro.h).
 
 Our program is setup to set the background color of the screen to yellow.
 
@@ -118,13 +118,13 @@ If you see the [Atari 2600 NTSC color palette] reference in Wikipedia, you'll
 see that pure yellow has a luminance/hue value of 1/14, represented by `1E` in
 hexadecimal.
 
-[Atari 2600 NTSC color palette]: https://en.wikipedia.org/wiki/List_of_video_game_console_palettes#NTSC
+[Atari 2600 NTSC color palette]: https://en.wikipedia.org/wiki/Television_Interface_Adaptor#NTSC_palette
 
 We have a `Makefile` in our directory with the commands used to assemble our
 `cart.bin` cartridge file, and also our command to run the cartridge in Stella.
 
 ```bash
-cd src/colorbg
+cd src/2_colorbg
 make all
 make run
 ```
@@ -346,6 +346,6 @@ After the loop is complete, we turn off the VBLANK mode.
 ## Painting the CRT
 
 We're going to paint a rainbow to the CRT with our program. See our
-[rainbow directory](../src/rainbow) for code.
+[rainbow directory](../src/3_rainbow) for code.
 
 [Back to Notes](./notes.md)
