@@ -249,4 +249,10 @@ to 1.
   stx CTRLPF
 ```
 
+## Player Bitmap and Scoreboard
+
+See [screen objects directory](../src/5_screenobjects) for code.
+
+## Playfield Color
+
 [Back to Notes](./notes.md)

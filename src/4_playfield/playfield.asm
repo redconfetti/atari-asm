@@ -78,9 +78,31 @@ StartFrame:
     ldx #0
     stx PF1
     stx PF2
-    REPEAT 164
+    REPEAT 80
       sta WSYNC
     REPEND
+
+    ; Set the next 164 lines only with PF0 third bit enabled
+    ldx #%00100000
+    stx PF0
+    ldx #%00101001
+    stx PF1
+    ldx #0
+    stx PF2
+    REPEAT 4
+      sta WSYNC
+    REPEND
+
+    ; Set the next 164 lines only with PF0 third bit enabled
+    ldx #%00100000
+    stx PF0
+    ldx #0
+    stx PF1
+    stx PF2
+    REPEAT 80
+      sta WSYNC
+    REPEND
+
 
     ; Set the PF0 to 1110 (LSB first) and PF1-PF2 as 1111 1111
     ldx #%11100000
