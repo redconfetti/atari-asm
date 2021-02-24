@@ -31,7 +31,7 @@ Scanlines will be rendered based on how we configure the TIA's screen objects
 * One color per horizontal scanline
 * The right side will either repeat or reflect the same pattern
 
-* PF0, PF1, PF2
+* PF0, PF1, PF2 - Playfield registers
 * COLUPF - Color of Playfield
 * CTRLPF - Control Playfield (8 bit register) with flags
   * D0: Reflect
