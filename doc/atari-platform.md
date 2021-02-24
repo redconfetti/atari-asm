@@ -2,7 +2,7 @@
 
 [Back to Notes](./notes.md)
 
-Atari was founded in 1972, famous for the [Pong] arcade gane (1972).
+Atari was founded in 1972, famous for the [Pong] arcade game (1972).
 
 Pong and [Tank] arcade games both used hard wired circuitry. They did not use
 cartridges like the Atari 2600. Both games have similar objects.

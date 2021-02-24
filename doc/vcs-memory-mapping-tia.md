@@ -85,20 +85,25 @@ The specifications of the Atari 2600 claim that it has 128 bytes of RAM memory,
 so why do the page zero addresses go from $00 to $FF, which is 256 addresses
 long?
 
-* Zero Page
-  * 0000 - 002C - TIA (write) - `$00 - $2C` - 45 address spaces
-  * 002D - 002F - ? - 2 address spaces
-  * 0030 - 003D - TIA (read) - `$30 - $3D` - 14 address spaces
-  * 003E - 007F - ? - 66 address spaces
-  * 0080 - 00FF - RIOT (RAM) - `$80 - $FF` - 128 address spaces
-* Non-Zero Page
-  * 0280 - 0297 - RIOT (I/O, Timer) - 32 address spaces
-  * F000 - FFFF - Cartridge (ROM) - 256 address spaces
+The 6507 chip has only 13 address pins-- A0 through A12-- so the usable
+addresses are an 8K block from $0000 through $1FFF. Internally the 6507 still
+uses 16-bit addresses, but since there are no pins for A13 through A15, any
+attempt to access $2000 through $FFFF will actually access $0000 through $1FFF:
+
+| Page      | Range       | Description       | Hex             | Spaces |
+| ----------|-------------|-------------------|-----------------|--------|
+| Zero      | 0000 - 002C | TIA (write)       | `$00 - $2C`     | 45     |
+| Zero      | 002D - 002F | ?                 | `$2D - $2F`     | 2      |
+| Zero      | 0030 - 003D | TIA (read)        | `$30 - $3D`     | 14     |
+| Zero      | 003E - 007F | ?                 | `$3E - $7F`     | 66     |
+| Zero      | 0080 - 00FF | RIOT (RAM)        | `$80 - $FF`     | 128    |
+| Non-Zero  | 0280 - 0297 | RIOT (I/O, Timer) | `$280 - $297`   | 32     |
+| Non-Zero  | F000 - FFFF | Cartridge (ROM)   | `$F000 - $FFFF` | 256    |
 
 The TIA and RIOT (RAM) span the 256 addresses?
 
 The [zero page], or base page, is the block of memory at the very beginning
-of a computer's addres space, that is, the page whose starting address is zero.
+of a computer's address space, that is, the page whose starting address is zero.
 
 In the 1970's, computer RAM was as fast or faster than the CPU, so it made
 sense to have few registers, and use the main memory as an extended pool of
@@ -106,6 +111,29 @@ extra registers. This "zero page" range of addresses is faster to access than
 other locations in such systems, but no longer applies to modern systems.
 
 [zero page]: https://en.wikipedia.org/wiki/Zero_page
+
+## Mirrored Memory
+
+Taken from [AtariAge - Mirrored memory]:
+
+The 6507 chip has only 13 address pins-- A0 through A12-- so the usable
+addresses are an 8K block from $0000 through $1FFF. Internally the 6507 still
+uses 16-bit addresses, but since there are no pins for A13 through A15, any
+attempt to access \$2000 through \$FFFF will actually access \$0000 through
+\$1FFF:
+
+| Range            | Description                 |
+|------------------|-----------------------------|
+| \$E000 - \$FFFF  | 8K mirror of $0000 - $1FFF  |
+| \$C000 - \$DFFF  | 8K mirror of $0000 - $1FFF  |
+| \$A000 - \$BFFF  | 8K mirror of $0000 - $1FFF  |
+| \$8000 - \$9FFF  | 8K mirror of $0000 - $1FFF  |
+| \$6000 - \$7FFF  | 8K mirror of $0000 - $1FFF  |
+| \$4000 - \$5FFF  | 8K mirror of $0000 - $1FFF  |
+| \$2000 - \$3FFF  | 8K mirror of $0000 - $1FFF  |
+| \$0000 - \$1FFF  | 8K of addressable memory    |
+
+[AtariAge - Mirrored memory]: https://atariage.com/forums/topic/192418-mirrored-memory/?tab=comments#comment-2439795
 
 ## Sending Instructions to the Display
 
@@ -259,7 +287,7 @@ scanlines called the 'over scan', before we start with a new frame again.
 |              |                                     |
 |              |                                     |
 |  HORIZONTAL  |           RENDERED PIXELS           |
-|    BLANK     |                                     |
+|    BLANK     |           (192 scanlines)           |
 |              |                                     |
 |              |                                     |
 |              |                                     |
